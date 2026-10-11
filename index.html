@@ -162,6 +162,36 @@ h1,h2,h3{font-family:'Space Grotesk',sans-serif;letter-spacing:-.055em}h1{font-s
 .photo-flush-stage .stage-footlabel{position:absolute;bottom:0;left:0;right:0;padding:40px 16px 18px;background:linear-gradient(transparent,#070a11ee);font-size:21px;font-weight:800}
 .missing-image{background:#1e2530;min-height:150px;font-size:12px;color:#cfdae7}
 @media (max-width:690px){.rank-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.rank-photo-card .rank-photo-body{padding:10px}.rank-photo-card .rank-name{font-size:14px}}
+
+/* Verified global leaderboard — prominent, mobile-first player standings. */
+.lb-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(245px,.8fr);gap:17px;margin-bottom:21px;align-items:start}
+.lb-panel{padding:18px 17px 10px;min-width:0}
+.lb-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.lb-heading h3{font-size:21px}
+.lb-count{background:#1c3531;border:1px solid #4a8c74;color:var(--mint);border-radius:999px;padding:6px 10px;font-size:10px;font-weight:800;letter-spacing:.07em}
+.lb-explainer{font-size:12px;line-height:1.5;color:#aabbd0;margin:9px 0 13px}
+.lb-search{width:100%;padding:11px 13px;font-size:13px;margin-bottom:14px;border-radius:11px}
+.lb-head,.lb-row{display:grid;grid-template-columns:51px minmax(95px,1fr) 125px 116px;gap:10px;align-items:center}
+.lb-head{font-size:10px;color:#92a4b8;font-weight:800;letter-spacing:.06em;padding:10px 8px 12px;border-bottom:1px solid #344356;text-transform:uppercase}
+.lb-row{width:100%;border:0;border-bottom:1px solid #2b3644;background:transparent;color:#eef5ff;text-align:left;padding:14px 8px;font-size:13px;transition:background .2s}
+.lb-row:hover,.lb-row:focus-visible{background:#273447;outline-offset:-2px}
+.lb-row.lb-me{background:#183d3196;border-radius:11px;border-color:#427760}
+.lb-pos{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:22px;white-space:nowrap}
+.lb-pos.p1{color:#ffcf68}.lb-pos.p2{color:#d7dfe8}.lb-pos.p3{color:#e1a278}
+.lb-player{min-width:0;display:flex;flex-direction:column;gap:5px}
+.lb-player strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800;font-size:13px}
+.lb-player .lb-sub{font-size:10px;color:#93a9bf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-value{text-align:right;font-family:'Space Grotesk',sans-serif;font-size:15px;font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+.lb-spend{color:var(--mint)}
+.lb-best{color:#cfdaea}
+.lb-mobile-best{display:none}
+.lb-hint{padding:11px 8px 4px;font-size:11px;color:#8fa1b4;line-height:1.6}
+.lb-empty{padding:22px 8px;font-size:13px;color:#aabbd0;line-height:1.55}
+.lb-side{padding:19px}
+.lb-side .escobar-photo{max-height:250px;margin:15px 0 12px;object-position:center 44%}
+.lb-collection{padding:17px 17px 3px;margin-top:17px}
+@media(max-width:960px){.lb-grid{grid-template-columns:1fr}.lb-side{display:none}}
+@media(max-width:650px){.lb-panel{padding:14px 10px 9px}.lb-heading{padding:0 4px}.lb-heading h3{font-size:18px}.lb-explainer{padding:0 4px}.lb-head,.lb-row{grid-template-columns:39px minmax(0,1fr) 112px;gap:7px}.lb-head{font-size:9px;padding:10px 4px}.lb-head .lb-best-head,.lb-row .lb-best{display:none}.lb-row{padding:14px 4px}.lb-pos{font-size:19px}.lb-player strong{font-size:12px}.lb-value{font-size:14px}.lb-mobile-best{display:block;font-size:10px;color:#b5c5d8;white-space:normal}.lb-hint{font-size:10px}.lb-search{font-size:16px}}
 </style>
 </head>
 <body>
@@ -335,7 +365,45 @@ function flushPage(){const current=currentStage();const unranked=verifiedTotal()
 function levelRange(t){const i=tiers.indexOf(t);if(i<0)return 'SPECIAL GLOBAL RANK';if(i===tiers.length-1)return money(t.min)+'+ VERIFIED LIFETIME';return money(t.min)+' – '+money(tiers[i+1].min-.01)+' VERIFIED LIFETIME';}
 function galleryCards(){return `<div class="rank-gallery">${toiletModels.map(m=>`<button type="button" class="rank-photo-card" data-model-rank="${m.rank}" aria-label="Open level ${m.rank}, ${esc(m.name)}"><img src="${modelPhoto(m)}" alt="${esc(m.name)}" loading="lazy"/><div class="rank-photo-body"><span class="rank-num">${m.rank<=3?'👑 OFFICIAL WORLD #'+m.rank:'LEVEL '+m.rank+' / 9'}</span><span class="rank-name">${esc(m.name)}</span><span class="rank-range ${m.rank<=3?'exclusive':''}">${m.rank<=3?'EXCLUSIVE VERIFIED TOP '+m.rank:levelRange(tiers.find(t=>t.rank===m.rank))}</span></div></button>`).join('')}</div>`;}
 function showToiletModel(m){if(!m)return;const isTop=m.rank<=3;modal(modalHeader(m.name)+`<div class="photo-modal">${imageHtml(m)}</div><div class="eyebrow">${isTop?'EXCLUSIVE GLOBAL RANK #'+m.rank:'LIFETIME LEVEL '+m.rank+' / 9'}</div><p class="muted">${esc(m.desc)}</p><p style="font-size:12px;color:var(--gold)">${isTop?'Available for new flushes only while holding verified world rank #'+m.rank:levelRange(tiers.find(t=>t.rank===m.rank))}</p><p class="hint">Static toilet photo preview. Personal animated clips require verified payment.</p><button class="secondary full" data-close>CLOSE</button>`);}
-function ranksPage(){const l=verifiedLeader();return `<div class="top-title"><div><div class="eyebrow">THE WORLD STAGE</div><h2>The Legends Board</h2><p class="section-sub">One real global rank per player, based on the largest single verified paid flush. Tap a player or toilet to see their photo.</p></div><span class="badge">VERIFIED ONLY</span></div><div class="panel" style="padding:18px 18px 3px;margin-bottom:20px"><h3>Explore the 9 toilets</h3><p class="section-sub">World #1–#3 have exclusive thrones. Levels 4–9 depend on each player's verified lifetime total, not their position in the global ranking.</p>${galleryCards()}</div>${rankingError?`<div class="banner">Could not load verified rankings: ${esc(rankingError)}</div>`:''}<div class="rank-grid"><div class="panel rank-list"><div class="rank-head"><span>RANK</span><span>FLUSHER</span><span class="rank-title-col">TOILET</span><span style="text-align:right">BEST FLUSH</span></div>${rankingBusy?'<p class="muted" style="padding:24px">Loading rankings…</p>':verifiedBoard.length?verifiedBoard.map(r=>`<button type="button" class="rank-row ${authUser?.id===r.user_id?'you':''}" data-user-rank="${Number(r.global_rank)}" title="View this player’s toilet" style="width:100%;border-left:0;border-right:0;border-top:0;background:transparent;color:inherit;text-align:left"><div class="rank-number">#${Number(r.global_rank)}</div><div><div class="rank-person">${esc(r.nickname)}${authUser?.id===r.user_id?' ✦ YOU':''}</div><span class="muted" style="font-size:10px">Verified paid flush · tap photo</span></div><div class="rank-title-col"><span class="rank-title">${esc(modelForVerifiedUser(r).name)}</span></div><div class="rank-price mono">${money(Number(r.best_flush_cents)/100)}</div></button>`).join(''):'<p class="muted" style="padding:22px">No verified paid flushes yet. The first real record will appear after payments launch.</p>'}</div><div class="panel rank-side"><div class="overline">EXCLUSIVE WORLD #1</div><button data-model-rank="1" type="button" style="border:0;padding:0;background:transparent;width:100%;cursor:pointer" aria-label="Open Escobar rank 1 toilet"><img class="escobar-photo" src="./9C9195EF-73E4-41B6-8C4B-FD6A994517F6.png" alt="Escobar golden throne"/></button><h3 style="color:var(--gold);margin-top:12px">ESCOBAR THRONE</h3><p class="muted" style="font-size:13px">Only the current verified world #1 unlocks this special video. Browsing its photo is free.</p><div class="summary"><div><span class="muted">Current holder</span><b>${l?esc(l.nickname):'Unclaimed'}</b></div><div><span class="muted">Record to beat</span><b>${l?money(Number(l.best_flush_cents)/100):'First verified flush'}</b></div></div><button class="secondary full" data-page="profile">${authUser?'MY PROFILE':'CLAIM YOUR NICKNAME'}</button></div></div>`}
+function ranksPage(){
+  const l=verifiedLeader();
+  const playerList=rankingBusy
+    ? '<div class="lb-empty" role="status">Loading verified rankings…</div>'
+    : verifiedBoard.length
+      ? verifiedBoard.map(r=>{
+          const rank=Number(r.global_rank),isMe=authUser?.id===r.user_id;
+          const model=modelForVerifiedUser(r);
+          const lifetime=money(Number(r.lifetime_cents)/100);
+          const single=money(Number(r.best_flush_cents)/100);
+          return `<button class="lb-row ${isMe?'lb-me':''}" type="button" data-user-rank="${rank}" data-search-name="${esc(String(r.nickname).toLowerCase())}" title="View ${esc(r.nickname)}'s toilet" aria-label="World rank ${rank}, ${esc(r.nickname)}, total spent ${lifetime}, biggest flush ${single}. View toilet.">
+            <span class="lb-pos ${rank<=3?'p'+rank:''}">${rank<=3?['','🥇','🥈','🥉'][rank]:'#'+rank}</span>
+            <span class="lb-player"><strong>${esc(r.nickname)}${isMe?' ✦ YOU':''}</strong><span class="lb-sub">${esc(model.name)}</span><span class="lb-mobile-best">Best flush: ${single}</span></span>
+            <span class="lb-value lb-spend">${lifetime}</span>
+            <span class="lb-value lb-best">${single}</span>
+          </button>`;
+        }).join('')
+      : '<div class="lb-empty">No verified paid flushes yet. Once real payments launch, players will appear here automatically with their nickname, lifetime spend and world rank.</div>';
+  return `<div class="top-title"><div><div class="eyebrow">THE WORLD STAGE</div><h2>Global leaderboard</h2><p class="section-sub">Real player rankings. See who has flushed the most in a single payment — and how much they have spent in total.</p></div><span class="badge">VERIFIED ONLY</span></div>
+    ${rankingError?`<div class="banner" role="alert">Could not load verified rankings: ${esc(rankingError)}</div>`:''}
+    <section class="lb-grid" aria-label="World ranking and player spend">
+      <div class="panel lb-panel">
+        <div class="lb-heading"><h3>🏆 World rankings</h3><span class="lb-count">TOP 100 · VERIFIED</span></div>
+        <p class="lb-explainer">Players are ranked by their <b>biggest single verified flush</b>. Total spent is the sum of their verified payments. Tap a player to see their toilet.</p>
+        ${verifiedBoard.length?'<input class="lb-search" type="search" id="leaderboard-search" aria-label="Search players by nickname" placeholder="🔎 Search nickname in the top 100…" autocomplete="off" maxlength="40"/>':''}
+        <div class="lb-head"><span>RANK</span><span>NICKNAME</span><span style="text-align:right">TOTAL SPENT</span><span class="lb-best-head" style="text-align:right">BEST FLUSH</span></div>
+        <div id="leaderboard-players">${playerList}</div>
+        <p id="leaderboard-no-search" class="lb-empty hidden">No matching nickname in the loaded top 100.</p>
+        <p class="lb-hint">Showing up to the top 100 verified players. Only confirmed payments count; refunded or test transactions are excluded.</p>
+      </div>
+      <aside class="panel lb-side"><div class="overline">♛ EXCLUSIVE WORLD #1</div>
+        <button data-model-rank="1" type="button" style="border:0;padding:0;background:transparent;width:100%;cursor:pointer" aria-label="Open Escobar rank 1 toilet"><img class="escobar-photo" src="./9C9195EF-73E4-41B6-8C4B-FD6A994517F6.png" alt="Escobar golden throne"/></button>
+        <h3 style="color:var(--gold)">ESCOBAR THRONE</h3><p class="muted" style="font-size:12px">Only the verified #1 player receives the exclusive Escobar video after paying. Everyone can view the photo.</p>
+        <div class="summary"><div><span class="muted">Current holder</span><b>${l?esc(l.nickname):'Unclaimed'}</b></div><div><span class="muted">Best flush</span><b>${l?money(Number(l.best_flush_cents)/100):'—'}</b></div><div><span class="muted">Total spent</span><b>${l?money(Number(l.lifetime_cents)/100):'—'}</b></div></div>
+        <button class="secondary full" data-page="profile">${authUser?'MY PROFILE':'CLAIM YOUR NICKNAME'}</button>
+      </aside>
+    </section>
+    <section class="panel lb-collection"><h3>Explore all 9 toilets</h3><p class="section-sub">The top 3 players hold exclusive rank thrones. For everyone else, toilet levels depend on lifetime verified spending, not their exact global rank.</p>${galleryCards()}</section>`;
+}
 function toiletsPage(){const myRankValue=verifiedRank();const userModel=myRankValue&&myRankValue<=3?modelForRank(myRankValue):(verifiedTotal()>0?tiers[getTier(verifiedTotal())]:null);return `<div class="top-title"><div><div class="eyebrow">THE COLLECTION</div><h2>All 9 legendary toilets.</h2><p class="section-sub">Tap any photo to see it up close. The first three are exclusive world-ranking thrones; the other six use cumulative verified payments.</p></div><span class="badge">9 TOILETS</span></div><div class="banner">Photos are publicly visible. Actual flush animations and personalized videos are reserved for verified paid flushes. No live payments yet.${userModel?' Your earned toilet: '+esc(userModel.name):''}</div>${galleryCards()}` }
 function profilePage(){if(!authUser)return authForm();const real=verifiedTotal(),t=realToiletLevel(),rank=verifiedRank(),model=rank&&rank<=3?modelForRank(rank):(real>0?tiers[t]:null);return `<div class="top-title"><div><div class="eyebrow">YOUR LEGACY · ONLINE ACCOUNT</div><h2>My profile</h2><p class="section-sub">Your email and nickname are stored in Supabase. Only verified paid flushes influence the global leaderboard.</p></div><button class="small-button" id="logout-button">LOG OUT</button></div><div class="profile-grid"><div class="panel profile-card"><div class="avatar">${rank===1?'👑':'🚽'}</div><p class="auth-status">✓ SIGNED IN · ${esc(authUser.email||'')}</p><label class="field-label" for="nickname">Public nickname</label><div class="spread"><input id="nickname" value="${esc(authProfile?.nickname||'')}" maxlength="24" minlength="3" spellcheck="false" autocapitalize="off"/><button id="save-name" class="small-button">SAVE</button></div><p class="hint">3–24 letters, numbers or underscores. Each nickname is unique worldwide.</p>${authError?`<p class="auth-error">${esc(authError)}</p>`:''}${authNotice?`<p class="auth-success">${esc(authNotice)}</p>`:''}<div class="summary"><div><span class="muted">Verified lifetime</span><b>${money(real)}</b></div><div><span class="muted">Best verified flush</span><b>${money(verifiedBest())}</b></div><div><span class="muted">Global world rank</span><b>${rank?'#'+rank:'Unranked'}</b></div><div><span class="muted">Your toilet</span><b>${model?esc(model.name)+' · Level '+model.rank+'/9':'Not yet unlocked'}</b></div><div><span class="muted">Public nickname</span><b>${esc(myPublicNickname())}</b></div></div><button class="primary full" data-page="toilets">EXPLORE ALL 9 TOILETS →</button></div><div class="panel profile-card"><h3>Paid flush history</h3><p class="verified-note" style="margin:12px 0">Personal paid videos, transaction history and shareable receipts will be available after the secure payments service goes live. This version cannot charge cards or create paid animations.</p><div class="panel" style="padding:13px;margin-top:22px"><div class="eyebrow">COMING SOON</div><p class="muted" style="font-size:13px">A successful server-confirmed payment will determine your toilet, update your verified totals and unlock a personal video.</p></div></div></div>`}
 function verificationPage(){return `<div class="panel verify-card"><h2>Verified receipts coming soon</h2><p class="muted">Only server-confirmed paid flushes will receive public verification links. Old local demo previews are not proof of payment.</p><button class="secondary" data-page="ranks">View rankings →</button></div>`}
@@ -351,7 +419,14 @@ function bindAccountUI(){
   let login=document.getElementById('auth-login-tab');if(login)login.onclick=()=>{authMode='login';authError='';authNotice='';render()};
   let logout=document.getElementById('logout-button');if(logout)logout.onclick=signOut;
 }
-function bindPage(){bindAccountUI();document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));let saveName=document.getElementById('save-name');if(saveName)saveName.onclick=savePublicNickname;document.querySelectorAll('[data-model-rank]').forEach(b=>b.onclick=()=>showToiletModel(modelForRank(Number(b.dataset.modelRank))));document.querySelectorAll('[data-user-rank]').forEach(b=>b.onclick=()=>{const r=verifiedBoard.find(x=>Number(x.global_rank)===Number(b.dataset.userRank));if(r)showToiletModel(modelForVerifiedUser(r))});}
+function bindPage(){bindAccountUI();document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>navigate(b.dataset.page));let saveName=document.getElementById('save-name');if(saveName)saveName.onclick=savePublicNickname;document.querySelectorAll('[data-model-rank]').forEach(b=>b.onclick=()=>showToiletModel(modelForRank(Number(b.dataset.modelRank))));document.querySelectorAll('[data-user-rank]').forEach(b=>b.onclick=()=>{const r=verifiedBoard.find(x=>Number(x.global_rank)===Number(b.dataset.userRank));if(r)showToiletModel(modelForVerifiedUser(r))});
+  const search=document.getElementById('leaderboard-search');
+  if(search)search.addEventListener('input',()=>{
+    const query=search.value.trim().toLocaleLowerCase();let visible=0;
+    document.querySelectorAll('#leaderboard-players [data-search-name]').forEach(item=>{const match=item.dataset.searchName.includes(query);item.classList.toggle('hidden',!match);if(match)visible++});
+    const noMatches=document.getElementById('leaderboard-no-search');if(noMatches)noMatches.classList.toggle('hidden',visible>0);
+  });
+}
 function checkoutModal(){toast('Personal flush animations are available only after a server-verified payment. Payments are not live yet.')}
 function doFlush(){toast('Personal flush animations are available only after a server-verified payment. Payments are not live yet.')}
 function showResult(){toast('Personal flush animations are available only after a server-verified payment. Payments are not live yet.')}
