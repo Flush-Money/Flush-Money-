@@ -395,7 +395,7 @@ function videoPage(){
   if(!authUser)stateMarkup=`<div class="flush-video-status">Please sign in to view your paid test video.<br><button class="primary" data-page="profile" style="margin-top:15px">LOG IN →</button></div>`;
   else if(flushVideoState==='ready'&&flushVideoData?.video_url){
     const videoUrl=esc(flushVideoData.video_url);
-    stateMarkup=`<video class="flush-video-player" id="paid-flush-player" controls playsinline preload="metadata" src="${videoUrl}"></video><div id="flush-after-video" class="flush-end-result" hidden><div class="eyebrow">FLUSH COMPLETE · STRIPE TEST</div><h2 style="color:var(--mint);margin:10px 0">${money(flushVideoData.amount_cents/100)} FLUSHED!</h2><p style="font-weight:750">@${esc(authProfile?.nickname||'YOUR LEGEND')}</p><p class="muted" style="margin:7px 0 16px">CLASSIC THRONE · TEST MODE · NO OFFICIAL RANK</p><button class="primary full" data-page="flush">🚽 FLUSH AGAIN →</button><button class="secondary full" id="replay-flush-video" style="margin-top:10px">↻ WATCH AGAIN</button></div><p class="hint">Stripe Sandbox video. Tap Play if your iPhone blocks autoplay with sound. Your details appear after playback.</p><button class="secondary full" id="reload-flush-video" style="margin-top:13px">↻ RELOAD VIDEO</button>`;
+    stateMarkup=`<video class="flush-video-player" id="paid-flush-player" controls playsinline preload="metadata" src="${videoUrl}"></video><div id="flush-after-video" class="flush-end-result" hidden><img src="./7CB9F68D-B09F-4B70-BA74-754418F5BD57.png" alt="FLUSH MONEY" style="height:64px;width:64px;object-fit:contain;border-radius:12px;margin:0 auto 12px;display:block"><div class="eyebrow">FLUSH MONEY · FLUSH COMPLETE · STRIPE TEST</div><h2 style="color:var(--mint);margin:10px 0">${money(flushVideoData.amount_cents/100)} FLUSHED!</h2><p style="font-weight:750">@${esc(authProfile?.nickname||'YOUR LEGEND')}</p><p class="muted" style="margin:7px 0 16px">CLASSIC THRONE · TEST MODE · NO OFFICIAL RANK</p><button class="primary full" data-page="flush">🚽 FLUSH AGAIN →</button><button class="secondary full" id="replay-flush-video" style="margin-top:10px">↻ WATCH AGAIN</button></div><p class="hint">Stripe Sandbox video. Tap Play if your iPhone blocks autoplay with sound. Your details appear after playback.</p><button class="secondary full" id="reload-flush-video" style="margin-top:13px">↻ RELOAD VIDEO</button>`;
   }else if(flushVideoState==='error')stateMarkup=`<div class="flush-video-status">${esc(flushVideoError||'Unable to load your video.')}<br><button class="primary" id="retry-flush-video" style="margin-top:15px">TRY AGAIN ↻</button></div>`;
   else stateMarkup=`<div class="flush-video-status"><strong>VERIFYING YOUR TEST PAYMENT…</strong><br>${flushVideoState==='pending'?'Stripe payment is being confirmed by the webhook. This can take a few moments.':'Checking secure video access…'}<br><button class="secondary" id="retry-flush-video" style="margin-top:16px">CHECK AGAIN ↻</button></div>`;
   return `<div class="top-title"><div><div class="eyebrow">YOUR PAID FLUSH · STRIPE SANDBOX</div><h2>🎬 YOUR FLUSH VIDEO</h2><p class="section-sub">Only the payer can request this private test video.</p></div><span class="badge demo">TEST MODE</span></div><div class="panel flush-video-shell flush-video-card">${stateMarkup}<button class="secondary full" data-page="profile" style="margin-top:14px">MY PROFILE →</button></div>`;
@@ -532,10 +532,15 @@ function bindPage(){bindAccountUI();
   const player=document.getElementById('paid-flush-player');
   const result=document.getElementById('flush-after-video');
   if(player&&result){
-    player.addEventListener('ended',()=>{result.hidden=false;});
-    player.addEventListener('play',()=>{result.hidden=true;});
+    const showResult=()=>{result.hidden=false;result.style.display='block';};
+    const hideResult=()=>{result.hidden=true;result.style.display='';};
+    player.addEventListener('ended',showResult);
+    player.addEventListener('timeupdate',()=>{if(Number.isFinite(player.duration)&&player.duration>0&&player.currentTime>=player.duration-0.18)showResult();});
+    player.addEventListener('pause',()=>{if(player.ended||(Number.isFinite(player.duration)&&player.duration>0&&player.currentTime>=player.duration-0.3))showResult();});
+    player.addEventListener('play',hideResult);
+    if(player.ended)showResult();
     const replay=document.getElementById('replay-flush-video');
-    if(replay)replay.onclick=()=>{result.hidden=true;player.currentTime=0;player.play().catch(()=>{});};
+    if(replay)replay.onclick=()=>{hideResult();player.currentTime=0;player.play().catch(()=>{});};
   }
   function syncAmount(next){if(!Number.isFinite(next)||next<1||next>10000){const err=document.getElementById('flush-amount-error');if(err){err.style.display='block';err.textContent='Enter an amount between €1 and €10,000.'}return false;}amount=Math.round(next*100)/100;const sum=document.getElementById('flush-selected-total');if(sum)sum.textContent=money(amount);const go=document.getElementById('go-to-checkout');if(go)go.textContent='🚽 FLUSH '+money(amount)+' →';document.querySelectorAll('[data-flush-amount]').forEach(b=>b.classList.toggle('selected',Number(b.dataset.flushAmount)===amount));const err=document.getElementById('flush-amount-error');if(err)err.style.display='none';return true;}
   document.querySelectorAll('[data-flush-amount]').forEach(b=>b.onclick=()=>{const a=Number(b.dataset.flushAmount);const field=document.getElementById('flush-custom');if(field)field.value=a;syncAmount(a)});
